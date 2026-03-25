@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marcus Arcade</title>
+  <link id="favicon" rel="icon" type="image/png" href="">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: none;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: url('https://www.icegif.com/wp-content/uploads/2024/02/icegif-244.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: -2;
+    }
+
+    .cursor {
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      box-shadow: 
+        0 0 10px #fff,
+        0 0 20px #fff,
+        0 0 30px #fff,
+        0 0 40px rgba(255, 255, 255, 0.8);
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s;
+    }
+
+    .cursor.active {
+      width: 20px;
+      height: 20px;
+      box-shadow: 
+        0 0 20px #fff,
+        0 0 40px #fff,
+        0 0 60px #fff,
+        0 0 80px rgba(255, 255, 255, 0.9);
+    }
+
+    .marker-particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      border-radius: 50%;
+      animation: fadeMarker 0.5s forwards;
+    }
+
+    @keyframes fadeMarker {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+    }
+
+    .rain-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .rain-drop {
+      position: absolute;
+      width: 2px;
+      height: 20px;
+      background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.8));
+      animation: fall linear infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh);
+      }
+    }
+
+    .settings-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: none;
+      z-index: 100;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .settings-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(90deg);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .settings-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .settings-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .settings-content {
+      background: rgba(20, 20, 20, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      backdrop-filter: blur(20px);
+      transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+
+    .settings-modal.active .settings-content {
+      transform: scale(1);
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 1rem;
+    }
+
+    .settings-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: none;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.3s;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .setting-section {
+      margin-bottom: 2rem;
+    }
+
+    .setting-label {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: block;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .cloak-options {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .cloak-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 1rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: none;
+      transition: all 0.3s;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+    }
+
+    .cloak-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateX(5px);
+    }
+
+    .cloak-btn.active {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .cloak-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      object-fit: cover;
+    }
+
+    .about-blank-btn {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 1rem;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: none;
+      transition: all 0.3s;
+      margin-top: 1rem;
+    }
+
+    .about-blank-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .arcade-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 4rem;
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: linear-gradient(135deg, #fff 0%, #e0e0e0 50%, #fff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+      margin-top: 2rem;
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 10px rgba(255,255,255,0.4)); }
+      to { filter: drop-shadow(0 0 30px rgba(255,255,255,0.8)); }
+    }
+
+    .widget-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 30px;
+      padding: 2rem 3rem;
+      box-shadow: 
+        0 8px 32px 0 rgba(0, 0, 0, 0.37),
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+      text-align: center;
+      max-width: 450px;
+      width: 100%;
+      margin: 1rem 0;
+    }
+
+    #clock {
+      font-family: 'Orbitron', monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+      letter-spacing: 2px;
+    }
+
+    #date {
+      margin-top: 0.5rem;
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    .stats-row {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 1rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .battery-icon {
+      color: #4ade80;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 1000px;
+      margin-bottom: 3rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(10px);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(255, 255, 255, 0.1);
+    }
+
+    .card-icon-wrapper {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+      overflow: hidden;
+      font-size: 2.5rem;
+    }
+
+    .card:hover .card-icon-wrapper {
+      background: rgba(0, 0, 0, 0.5);
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .card-icon-wrapper img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+    }
+
+    .card h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 0;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+    }
+
+    .card:hover p {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-games:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 0, 85, 0.3); }
+    .card-tv:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 200, 255, 0.3); }
+    .card-music:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 200, 0, 0.3); }
+    .card-proxy:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 255, 150, 0.3); }
+
+    @media (max-width: 968px) {
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+      .arcade-title { font-size: 3rem; }
+    }
+
+    @media (max-width: 600px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .arcade-title { font-size: 2.5rem; }
+      #clock { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor"></div>
+  
+  <div class="rain-container" id="rainContainer"></div>
+
+  <button class="settings-btn" onclick="openSettings()">
+    <i class="fas fa-cog"></i>
+  </button>
+
+  <div class="settings-modal" id="settingsModal">
+    <div class="settings-content">
+      <div class="settings-header">
+        <h2 class="settings-title">Settings</h2>
+        <button class="close-btn" onclick="closeSettings()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="setting-section">
+        <label class="setting-label">Tab Cloak</label>
+        <div class="cloak-options">
+          <button class="cloak-btn" onclick="setCloak('none')" id="cloak-none">
+            <span>Default</span>
+          </button>
+          <button class="cloak-btn" onclick="setCloak('ixl')" id="cloak-ixl">
+            <img src="https://th.bing.com/th/id/OIP.sidYMEUUf0VB3KTmc8-pogHaHa?w=169&h=180&c=7&r=0&o=7&pid=1.7&rm=3" class="cloak-icon" alt="IXL">
+            <span>IXL</span>
+          </button>
+          <button class="cloak-btn" onclick="setCloak('classroom')" id="cloak-classroom">
+            <img src="https://th.bing.com/th?q=Google+Classroom+Blue+Icon&w=120&h=120&c=1&rs=1&qlt=70&o=7&cb=1&pid=InlineBlock&rm=3&mkt=en-US&cc=US&setlang=en&adlt=moderate&t=1&mw=247" class="cloak-icon" alt="Classroom">
+            <span>Google Classroom</span>
+          </button>
+          <button class="cloak-btn" onclick="setCloak('canvas')" id="cloak-canvas">
+            <img src="https://th.bing.com/th/id/ODF.8V0Dl_QsprEAzsXabwnfEA?w=32&h=32&qlt=92&pcl=fffffa&o=6&pid=1.2" class="cloak-icon" alt="Canvas">
+            <span>Canvas</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <label class="setting-label">Stealth Mode</label>
+        <button class="about-blank-btn" onclick="openAboutBlank()">
+          <i class="fas fa-external-link-alt" style="margin-right: 8px;"></i>
+          Open in about:blank
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1 class="arcade-title">MARCUS ARCADE</h1>
+
+    <div class="widget-container">
+      <div id="clock">04:45:58 PM</div>
+      <div id="date">Friday, March 20, 2026</div>
+      
+      <div class="stats-row">
+        <div class="stat-item">
+          <i id="battery-icon" class="fas fa-battery-three-quarters battery-icon"></i>
+          <span id="battery-level">94%</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-temperature-half"></i>
+          <span id="temp-val">94°F</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <a href="games.html" class="card card-games">
+        <div class="card-icon-wrapper">
+          <i class="fas fa-gamepad" style="color: #fff; filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));"></i>
+        </div>
+        <h2>Games</h2>
+        <p>Play Now</p>
+      </a>
+
+      <a href="tv.html" class="card card-tv">
+        <div class="card-icon-wrapper">
+          <i class="fas fa-tv" style="color: #fff; filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));"></i>
+        </div>
+        <h2>TV</h2>
+        <p>Watch Now</p>
+      </a>
+
+      <a href="music.html" class="card card-music">
+        <div class="card-icon-wrapper">
+          <i class="fas fa-music" style="color: #fff; filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));"></i>
+        </div>
+        <h2>Music</h2>
+        <p>Listen Now</p>
+      </a>
+
+      <a href="proxy.html" class="card card-proxy">
+        <div class="card-icon-wrapper">
+          <span style="font-size: 2.5rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));">🌐</span>
+        </div>
+        <h2>Proxy</h2>
+        <p>Browse Now</p>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const cursor = document.querySelector('.cursor');
+    let mouseX = 0, mouseY = 0;
+    let cursorX = 0, cursorY = 0;
+    let lastParticle = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      
+      const now = Date.now();
+      if (now - lastParticle > 20) {
+        createMarkerParticle(e.clientX, e.clientY);
+        lastParticle = now;
+      }
+    });
+
+    function createMarkerParticle(x, y) {
+      const particle = document.createElement('div');
+      particle.className = 'marker-particle';
+      const size = Math.random() * 8 + 4;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      particle.style.background = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.5})`;
+      particle.style.boxShadow = `0 0 ${size * 2}px rgba(255, 255, 255, 0.8)`;
+      particle.style.left = x + 'px';
+      particle.style.top = y + 'px';
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 500);
+    }
+
+    function animateCursor() {
+      cursorX += (mouseX - cursorX) * 0.15;
+      cursorY += (mouseY - cursorY) * 0.15;
+      cursor.style.left = cursorX + 'px';
+      cursor.style.top = cursorY + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    const interactiveElements = document.querySelectorAll('a, .card, .widget-container, button, .cloak-btn');
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('active'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('active'));
+    });
+
+    function createRain() {
+      const container = document.getElementById('rainContainer');
+      const drops = 100;
+      
+      for (let i = 0; i < drops; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'rain-drop';
+        drop.style.left = Math.random() * 100 + '%';
+        drop.style.animationDuration = (Math.random() * 1 + 0.5) + 's';
+        drop.style.animationDelay = Math.random() * 2 + 's';
+        drop.style.opacity = Math.random() * 0.5 + 0.2;
+        container.appendChild(drop);
+      }
+    }
+    createRain();
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("clock").textContent = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById("date").textContent = now.toLocaleDateString(undefined, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    function updateBattery() {
+      if ('getBattery' in navigator) {
+        navigator.getBattery().then(function (battery) {
+          const level = Math.round(battery.level * 100);
+          const iconEl = document.getElementById("battery-icon");
+          
+          let iconClass = 'fas';
+          let colorClass = '';
+
+          if (level <= 10) {
+            iconClass += ' fa-battery-empty';
+            colorClass = '#ef4444';
+          } else if (level <= 30) {
+            iconClass += ' fa-battery-quarter';
+            colorClass = '#eab308';
+          } else {
+            iconClass += ' fa-battery-three-quarters';
+            colorClass = '#4ade80';
+          }
+
+          iconEl.className = `${iconClass} battery-icon`;
+          iconEl.style.color = colorClass;
+          document.getElementById("battery-level").textContent = `${level}%`;
+        });
+      }
+    }
+
+    function updateWeather() {
+      const tempEl = document.getElementById('temp-val');
+      const fetchTemp = (lat, lon) => {
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=fahrenheit`)
+          .then(res => res.json())
+          .then(data => {
+            tempEl.textContent = `${Math.round(data.current_weather.temperature)}°F`;
+          })
+          .catch(() => tempEl.textContent = 'N/A');
+      };
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => fetchTemp(pos.coords.latitude, pos.coords.longitude),
+          () => fetchTemp(34.58, -117.40)
+        );
+      } else {
+        fetchTemp(34.58, -117.40);
+      }
+    }
+
+    updateClock();
+    updateBattery();
+    updateWeather();
+    setInterval(updateClock, 1000);
+    setInterval(updateBattery, 60000);
+    setInterval(updateWeather, 600000);
+
+    document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
+    document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
+
+    function openSettings() {
+      document.getElementById('settingsModal').classList.add('active');
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsModal').classList.remove('active');
+    }
+
+    function setCloak(type) {
+      document.querySelectorAll('.cloak-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`cloak-${type}`).classList.add('active');
+      
+      const favicon = document.getElementById('favicon');
+      
+      switch(type) {
+        case 'ixl':
+          document.title = 'IXL | Math, Language Arts, Science, Social Studies, and …';
+          favicon.href = 'https://th.bing.com/th/id/OIP.sidYMEUUf0VB3KTmc8-pogHaHa?w=169&h=180&c=7&r=0&o=7&pid=1.7&rm=3';
+          localStorage.setItem('cloak', 'ixl');
+          break;
+        case 'classroom':
+          document.title = 'Home';
+          favicon.href = 'https://th.bing.com/th?q=Google+Classroom+Blue+Icon&w=120&h=120&c=1&rs=1&qlt=70&o=7&cb=1&pid=InlineBlock&rm=3&mkt=en-US&cc=US&setlang=en&adlt=moderate&t=1&mw=247';
+          localStorage.setItem('cloak', 'classroom');
+          break;
+        case 'canvas':
+          document.title = 'Canvas';
+          favicon.href = 'https://th.bing.com/th/id/ODF.8V0Dl_QsprEAzsXabwnfEA?w=32&h=32&qlt=92&pcl=fffffa&o=6&pid=1.2';
+          localStorage.setItem('cloak', 'canvas');
+          break;
+        default:
+          document.title = 'Marcus Arcade';
+          favicon.href = '';
+          localStorage.setItem('cloak', 'none');
+      }
+    }
+
+    function openAboutBlank() {
+      const newWindow = window.open('about:blank', '_blank');
+      if (newWindow) {
+        newWindow.document.write(`
+          <html>
+            <head>
+              <title>${document.title}</title>
+              <link rel="icon" href="${document.getElementById('favicon').href}">
+              <style>
+                body { margin: 0; overflow: hidden; background: #000; }
+                iframe { width: 100vw; height: 100vh; border: none; }
+              </style>
+            </head>
+            <body>
+              <iframe src="${window.location.href}"></iframe>
+            </body>
+          </html>
+        `);
+        newWindow.document.close();
+      }
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('settingsModal');
+      if (event.target == modal) {
+        closeSettings();
+      }
+    }
+
+    const savedCloak = localStorage.getItem('cloak');
+    if (savedCloak) {
+      setCloak(savedCloak);
+    } else {
+      document.getElementById('cloak-none').classList.add('active');
+    }
+  </script>
+</body>
+</html>
