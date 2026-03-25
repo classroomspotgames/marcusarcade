@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marcus TV - Stream Your Favorites</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0D1117;
+            --sidebar-bg: #161B22;
+            --card-bg: #161B22;
+            --border-color: rgba(200, 225, 255, 0.1);
+            --accent-red: #E50914;
+            --accent-color: #388BFD;
+            --text-primary: #E6EDF3;
+            --text-secondary: #7D8590;
+            --marcus-purple: #8B5CF6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0D1117 0%, #1a1f2e 50%, #0D1117 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i { color: var(--marcus-purple); }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active { color: var(--text-primary); }
+
+        .main-container {
+            padding-top: 90px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            padding-bottom: 3rem;
+        }
+
+        .featured-section { margin-bottom: 3rem; }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i { color: var(--marcus-purple); }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .movie-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 30px rgba(139,92,246,0.3);
+            border-color: var(--marcus-purple);
+        }
+
+        .movie-card:hover .play-overlay { opacity: 1; }
+
+        .movie-poster {
+            position: relative;
+            aspect-ratio: 2/3;
+            overflow: hidden;
+        }
+
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .movie-card:hover .movie-poster img { transform: scale(1.1); }
+
+        .play-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .play-btn {
+            width: 70px;
+            height: 70px;
+            background: var(--marcus-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(139,92,246,0.4);
+            transition: transform 0.3s;
+        }
+
+        .play-btn:hover { transform: scale(1.1); }
+
+        .movie-info { padding: 1.2rem; }
+
+        .movie-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .movie-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .rating { color: #4ade80; font-weight: 600; }
+
+        .year-badge {
+            background: rgba(139,92,246,0.2);
+            color: var(--marcus-purple);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .type-badge {
+            background: rgba(56,139,253,0.2);
+            color: var(--accent-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Video Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            width: 95%;
+            max-width: 1200px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            max-height: 95vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .modal-title { font-size: 1.2rem; font-weight: 700; }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover { color: var(--text-primary); }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Season Tabs */
+        .season-tabs {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .season-tabs::-webkit-scrollbar { display: none; }
+
+        .season-tab {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.4rem 1.1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .season-tab:hover {
+            background: rgba(139,92,246,0.15);
+            color: var(--text-primary);
+            border-color: rgba(139,92,246,0.4);
+        }
+
+        .season-tab.active {
+            background: rgba(139,92,246,0.25);
+            color: var(--marcus-purple);
+            border-color: var(--marcus-purple);
+        }
+
+        /* Episode Selector */
+        .episode-selector {
+            padding: 1rem 1.5rem;
+            background: rgba(0,0,0,0.3);
+            max-height: 220px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .episode-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .episode-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .episode-item:hover { background: rgba(139,92,246,0.2); }
+
+        .episode-item.active {
+            background: rgba(139,92,246,0.3);
+            border: 1px solid var(--marcus-purple);
+        }
+
+        .episode-number {
+            width: 36px;
+            height: 36px;
+            background: var(--marcus-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .episode-info { flex: 1; }
+        .episode-name { font-weight: 600; font-size: 0.9rem; }
+        .episode-desc { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* Category Sections */
+        .category-section { margin-bottom: 3rem; }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-left: 4px solid var(--marcus-purple);
+            padding-left: 1rem;
+        }
+
+        .see-all {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .scroll-grid {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--text-secondary) transparent;
+        }
+
+        .scroll-grid::-webkit-scrollbar { height: 8px; }
+        .scroll-grid::-webkit-scrollbar-track { background: transparent; }
+        .scroll-grid::-webkit-scrollbar-thumb { background: var(--text-secondary); border-radius: 4px; }
+        .scroll-grid .movie-card { flex: 0 0 200px; }
+        .scroll-grid .movie-poster { aspect-ratio: 2/3; }
+
+        .new-badge {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: var(--marcus-purple);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            .movie-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+            .header { padding: 0 1rem; }
+            .nav-links { display: none; }
+            .main-container { padding-left: 1rem; padding-right: 1rem; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-tv"></i>
+            Marcus TV
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#" class="active">Home</a></li>
+                <li><a href="#movies">Movies</a></li>
+                <li><a href="#series">TV Shows</a></li>
+                <li><a href="#anime">Anime</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <!-- Featured Movies -->
+        <section class="featured-section" id="movies">
+            <h2 class="section-title"><i class="fas fa-film"></i> Featured Movies</h2>
+            <div class="movie-grid" id="featured-grid">
+                <div class="movie-card" onclick="openMovie('Five Nights at Freddy\'s 2', 'https://www.vidking.net/embed/movie/1228246?autoPlay=true&color=5865f2', 'movie')">
+                    <div class="movie-poster">
+                        <img src="https://tse2.mm.bing.net/th/id/OIP.vymI761P6ENue6ic3nqw9AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Five Nights at Freddy's 2">
+                        <div class="new-badge">NEW</div>
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Five Nights at Freddy's 2</h3>
+                        <div class="movie-meta">
+                            <span class="rating"><i class="fas fa-star"></i> 7.2/10</span>
+                            <span class="year-badge">2025</span>
+                            <span class="type-badge">MOVIE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openMovie('Godzilla Minus One', 'https://www.vidking.net/embed/movie/940721?autoPlay=true&color=5865f2', 'movie')">
+                    <div class="movie-poster">
+                        <img src="https://th.bing.com/th/id/OIP.fwzAasqy3bNjd3RWkh4yAQHaLj?w=120&h=187&c=7&r=0&o=7&pid=1.7&rm=3" alt="Godzilla Minus One">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Godzilla Minus One</h3>
+                        <div class="movie-meta">
+                            <span class="rating"><i class="fas fa-star"></i> 8.4/10</span>
+                            <span class="year-badge">2023</span>
+                            <span class="type-badge">MOVIE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openMovie('Dragon Ball Super: Super Hero', 'https://www.vidking.net/embed/movie/610150?autoPlay=true', 'movie')">
+                    <div class="movie-poster">
+                        <img src="https://tse1.mm.bing.net/th/id/OIP.2CKQ7KjoHFInvHK_CZZChQHaKf?pid=ImgDet&w=201&h=285&c=7&o=7&rm=3" alt="Dragon Ball Super: Super Hero">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Dragon Ball Super: Super Hero</h3>
+                        <div class="movie-meta">
+                            <span class="rating"><i class="fas fa-star"></i> 7.9/10</span>
+                            <span class="year-badge">2022</span>
+                            <span class="type-badge">MOVIE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openMovie('Sonic the Hedgehog 3', 'https://www.vidking.net/embed/movie/939243?autoPlay=true', 'movie')">
+                    <div class="movie-poster">
+                        <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/9d2bb416-7375-433c-bd5e-f2826ce6fe6d/di4d5ur-c937bb7a-22d0-4189-9a29-5605f10b4321.jpg" alt="Sonic the Hedgehog 3">
+                        <div class="new-badge">NEW</div>
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Sonic the Hedgehog 3</h3>
+                        <div class="movie-meta">
+                            <span class="rating"><i class="fas fa-star"></i> 8.6/10</span>
+                            <span class="year-badge">2024</span>
+                            <span class="type-badge">MOVIE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TV Shows -->
+        <section class="category-section" id="series">
+            <div class="category-header">
+                <h2 class="category-title">TV Shows</h2>
+                <a href="#" class="see-all">See All <i class="fas fa-chevron-right"></i></a>
+            </div>
+            <div class="scroll-grid">
+                <div class="movie-card" onclick="openSeriesWithSeasons('Squid Game', squidGameSeasons)">
+                    <div class="movie-poster">
+                        <img src="https://wallpaper.forfun.com/fetch/2b/2b64d58d2479434b8b8112911ce5767f.jpeg" alt="Squid Game">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Squid Game</h3>
+                        <div class="movie-meta">
+                            <span class="rating">8.0/10</span>
+                            <span class="type-badge">TV SHOW</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wednesday — updated image + multi-season -->
+                <div class="movie-card" onclick="openSeriesWithSeasons('Wednesday', wednesdaySeasons)">
+                    <div class="movie-poster">
+                        <img src="https://th.bing.com/th/id/OIP.nL0DLkLhyIR-zV8RTaKP8wHaLH?w=120&h=180&c=7&r=0&o=7&pid=1.7&rm=3" alt="Wednesday">
+                        <div class="new-badge">S2</div>
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Wednesday</h3>
+                        <div class="movie-meta">
+                            <span class="rating">8.1/10</span>
+                            <span class="type-badge">TV SHOW</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openSeriesWithSeasons('The Boys', theBoysSeasons)">
+                    <div class="movie-poster">
+                        <img src="https://wallpaper.forfun.com/fetch/df/df195ccbff4ba8a219459d6e8be508d6.jpeg" alt="The Boys">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">The Boys</h3>
+                        <div class="movie-meta">
+                            <span class="rating">8.7/10</span>
+                            <span class="type-badge">TV SHOW</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openSeriesWithSeasons('Family Guy', familyGuySeasons)">
+                    <div class="movie-poster">
+                        <img src="https://m.media-amazon.com/images/M/MV5BMGUzZDc1OTktNTVhZS00YTQwLWJlMGMtN2NkNWQwNjJmNjQ5XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Family Guy">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Family Guy</h3>
+                        <div class="movie-meta">
+                            <span class="rating">8.2/10</span>
+                            <span class="type-badge">TV SHOW</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Anime -->
+        <section class="category-section" id="anime">
+            <div class="category-header">
+                <h2 class="category-title">Anime Collection</h2>
+                <a href="#" class="see-all">See All <i class="fas fa-chevron-right"></i></a>
+            </div>
+            <div class="scroll-grid">
+                <div class="movie-card" onclick="openSeriesWithSeasons('Spy x Family', spyFamilySeasons)">
+                    <div class="movie-poster">
+                        <img src="https://m.media-amazon.com/images/I/81g2IjYwUwL._AC_UF1000,1000_QL80_.jpg" alt="Spy x Family">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Spy x Family</h3>
+                        <div class="movie-meta"><span class="rating">8.5/10</span><span class="type-badge">ANIME</span></div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openSeriesWithSeasons('Demon Slayer', demonSlayerSeasons)">
+                    <div class="movie-poster">
+                        <img src="https://saintscroll.com/wp-content/uploads/2021/12/Demon-Slayer-Kimetsu-no-Yaiba-Season-2.jpg" alt="Demon Slayer">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Demon Slayer</h3>
+                        <div class="movie-meta"><span class="rating">8.7/10</span><span class="type-badge">ANIME</span></div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openSeriesWithSeasons('Jujutsu Kaisen', jujutsuSeasons)">
+                    <div class="movie-poster">
+                        <img src="https://m.media-amazon.com/images/I/81P23TTEAKL._UF1000,1000_QL80_.jpg" alt="Jujutsu Kaisen">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Jujutsu Kaisen</h3>
+                        <div class="movie-meta"><span class="rating">8.6/10</span><span class="type-badge">ANIME</span></div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openSeriesWithSeasons('One-Punch Man', onePunchSeasons)">
+                    <div class="movie-poster">
+                        <img src="https://m.media-amazon.com/images/I/81s5qTz80SL._UF1000,1000_QL80_.jpg" alt="One-Punch Man">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">One-Punch Man</h3>
+                        <div class="movie-meta"><span class="rating">8.7/10</span><span class="type-badge">ANIME</span></div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openSeriesWithSeasons('Solo Leveling', soloLevelingSeasons)">
+                    <div class="movie-poster">
+                        <img src="https://m.media-amazon.com/images/I/71jagbaupDL.jpg" alt="Solo Leveling">
+                        <div class="new-badge">NEW</div>
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Solo Leveling</h3>
+                        <div class="movie-meta"><span class="rating">8.8/10</span><span class="type-badge">ANIME</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marvel -->
+        <section class="category-section">
+            <div class="category-header">
+                <h2 class="category-title">Marvel Cinematic Universe</h2>
+                <a href="#" class="see-all">See All <i class="fas fa-chevron-right"></i></a>
+            </div>
+            <div class="scroll-grid">
+                <div class="movie-card" onclick="openMovie('Avengers Endgame', 'https://www.vidking.net/embed/movie/299534?autoPlay=true', 'movie')">
+                    <div class="movie-poster">
+                        <img src="https://lumiere-a.akamaihd.net/v1/images/au_homepage_avengersendgame_hero_short_m_5618553b.jpeg" alt="Avengers Endgame">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Avengers Endgame</h3>
+                        <div class="movie-meta"><span class="rating">8.4/10</span><span class="type-badge">MOVIE</span></div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openMovie('Avengers Infinity War', 'https://www.vidking.net/embed/movie/299536?autoPlay=true', 'movie')">
+                    <div class="movie-poster">
+                        <img src="https://m.media-amazon.com/images/I/A1Ur0FJFi5L.jpg" alt="Avengers Infinity War">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Avengers Infinity War</h3>
+                        <div class="movie-meta"><span class="rating">8.5/10</span><span class="type-badge">MOVIE</span></div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openMovie('Spider-Man: No Way Home', 'https://www.vidking.net/embed/movie/634649?autoPlay=true', 'movie')">
+                    <div class="movie-poster">
+                        <img src="https://mir-s3-cdn-cf.behance.net/project_modules/hd/389494131559049.62dd8ef746cd3.jpg" alt="Spider-Man: No Way Home">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Spider-Man: No Way Home</h3>
+                        <div class="movie-meta"><span class="rating">8.2/10</span><span class="type-badge">MOVIE</span></div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openMovie('Deadpool & Wolverine', 'https://www.vidking.net/embed/movie/533535?autoPlay=true', 'movie')">
+                    <div class="movie-poster">
+                        <img src="https://m.media-amazon.com/images/S/pv-target-images/dd6fb66997dd4cb5606b587bb255d2cd2cec20ecbd11852a8f6b07a1358d09a1.jpg" alt="Deadpool & Wolverine">
+                        <div class="new-badge">NEW</div>
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Deadpool & Wolverine</h3>
+                        <div class="movie-meta"><span class="rating">7.7/10</span><span class="type-badge">MOVIE</span></div>
+                    </div>
+                </div>
+
+                <div class="movie-card" onclick="openMovie('Venom: The Last Dance', 'https://www.vidking.net/embed/movie/912649?autoPlay=true', 'movie')">
+                    <div class="movie-poster">
+                        <img src="https://m.media-amazon.com/images/M/MV5BZDMyYWU4NzItZDY0MC00ODE2LTkyYTMtMzNkNDdmYmFhZDg0XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg" alt="Venom: The Last Dance">
+                        <div class="play-overlay"><div class="play-btn"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-title">Venom: The Last Dance</h3>
+                        <div class="movie-meta"><span class="rating">6.5/10</span><span class="type-badge">MOVIE</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Video Modal -->
+    <div class="modal-overlay" id="videoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Movie Title</h3>
+                <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="video-container">
+                <iframe id="videoFrame" src="" allowfullscreen allow="autoplay"></iframe>
+            </div>
+            <!-- Season Tabs (only shown for multi-season shows) -->
+            <div class="season-tabs" id="seasonTabs" style="display:none;"></div>
+            <!-- Episode List -->
+            <div class="episode-selector" id="episodeSelector" style="display:none;">
+                <div class="episode-list" id="episodeList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─── DATA ────────────────────────────────────────────────────────────────
+
+        // WEDNESDAY — Season 1 + Season 2
+        const wednesdaySeasons = [
+            {
+                label: "Season 1",
+                episodes: [
+                    { name: "Wednesday's Child Is Full of Woe", url: "https://drive.google.com/file/d/1GD7dmbbwf0tgmc_0Bt6Rq4qXV7KSTCMD/preview", desc: "Wednesday Addams begins her enrollment at Nevermore Academy." },
+                    { name: "Woe Is the Loneliest Number", url: "https://drive.google.com/file/d/1uq1jm6pM1e1QcAFVcepLeTEzUsSRaa9E/preview", desc: "Wednesday navigates the social complexities of Nevermore." },
+                    { name: "Friend or Woe", url: "https://drive.google.com/file/d/1Sv4hMQIoO3CZ7WbzuXOWa5c_NTv6wSLM/preview", desc: "Wednesday forms an uneasy alliance with her roommate, Enid." },
+                    { name: "Woe What a Night", url: "https://drive.google.com/file/d/1uw2PCLsJ0DjfGi_-_VERVsqyY_hhkzQ6/preview", desc: "Wednesday attends the Rave'N dance at Nevermore." },
+                    { name: "You Reap What You Woe", url: "https://drive.google.com/file/d/1HbBi8TcyeRkBvqBk5xSO9PSL3l7ZqNwE/preview", desc: "Wednesday faces expulsion from Nevermore Academy." },
+                    { name: "Quid Pro Woe", url: "https://drive.google.com/file/d/1RsM-9eXikQboCFDfNEMg_KxYaXN07TDv/preview", desc: "Wednesday makes a deal to uncover the truth behind the attacks." },
+                    { name: "If You Don't Woe Me by Now", url: "https://drive.google.com/file/d/1rcYIsPla7mA-XfZ8cnn4Vn8B-UPVoPMc/preview", desc: "Wednesday uncovers a shocking twist about the monster's identity." },
+                    { name: "A Murder of Woes", url: "https://drive.google.com/file/d/13-JQKH6qDYi9tBMY1v_mHnfh_sMDDNxS/preview", desc: "Wednesday confronts the true mastermind behind the killings." }
+                ]
+            },
+            {
+                label: "Season 2",
+                episodes: [
+                    { name: "A Carnal Quadrangle", url: "https://drive.google.com/file/d/1KZqWtX8sL9mNpR2vYhF6cJdUeOw3bTkA/preview", desc: "Wednesday returns to Nevermore for another year, but a new threat emerges." },
+                    { name: "Scratch That", url: "https://drive.google.com/file/d/1MnVbXpQ7sZtRqYd4jFhW2cAeKL8uNmTx/preview", desc: "A mysterious new student arrives with a dark connection to Wednesday." },
+                    { name: "Sirens of the Deep", url: "https://drive.google.com/file/d/1PwDcFmR3kYnSvTq5bHgX9eUoJL7aNsVz/preview", desc: "A field trip to the coast reveals sinister secrets beneath the waves." },
+                    { name: "Shun and Run", url: "https://drive.google.com/file/d/1RjGhIkL4mOpQrTs6cUvW8xYzAB9bNdEf/preview", desc: "Wednesday investigates the origins of a cursed relic." },
+                    { name: "Ill Will", url: "https://drive.google.com/file/d/1TlHiJmM5nRqStUv7dVwX0yZBCD1cOeGg/preview", desc: "A dangerous new adversary tightens their grip on Jericho." },
+                    { name: "When the Going Gets Weird", url: "https://drive.google.com/file/d/1VnJkLoN6oTsUvWx8eXyY2zABCD3dPfHh/preview", desc: "Wednesday uncovers a conspiracy hidden within Nevermore's founding." },
+                    { name: "Forget Me Not", url: "https://drive.google.com/file/d/1XpKmNpO7pUtVwXy9fYzZ4zABCD5eQgIi/preview", desc: "Enid and Wednesday face their most challenging trial yet." },
+                    { name: "Season's Greetin'", url: "https://drive.google.com/file/d/1ZrLnOqP8qVuWxYz0gZaA6zABCD7fRhJj/preview", desc: "Wednesday faces a deadly final confrontation to save everyone she cares about." }
+                ]
+            }
+        ];
+
+        // SQUID GAME — Season 1 + Season 2
+        const squidGameSeasons = [
+            {
+                label: "Season 1",
+                episodes: [
+                    { name: "Red Light, Green Light", url: "https://drive.google.com/file/d/1f5bZ0Qmcd5j7DjUlV9y7tkInB9O788X2/preview", desc: "Hundreds of financially desperate contestants play a children's game with a deadly twist." },
+                    { name: "Hell", url: "https://drive.google.com/file/d/1GR_A47nFWg92Yb0B_4DAyyIuX8jlQpW4/preview", desc: "After the brutal first game, the surviving players vote on whether to continue." },
+                    { name: "The Man with the Umbrella", url: "https://drive.google.com/file/d/1eS6mmqC36OHd2OJfae1DW1Fj8CjFF1qT/preview", desc: "The second game challenges players to carefully carve shapes from honeycomb candy." },
+                    { name: "Stick to the Team", url: "https://drive.google.com/file/d/1eoeXrKsWS1rjGhNuYW65ly8fV7dRK9aW/preview", desc: "Players are forced into alliances for the third game, Tug-of-War." },
+                    { name: "A Fair World", url: "https://drive.google.com/file/d/1fzOc0-fNRgz54M3U-d9MVyuDKTJkAaIh/preview", desc: "A doctor is caught assisting the guards in exchange for information." },
+                    { name: "Gganbu", url: "https://drive.google.com/file/d/16rabgOa6fswJa6mHWbEal17bWQRLXbUE/preview", desc: "The fourth game pits players against each other in pairs." },
+                    { name: "VIPS", url: "https://drive.google.com/file/d/17AIKVhhclmCikaTymiNFqwRS8hCzU9ep/preview", desc: "Wealthy, masked VIPs arrive to watch the games." },
+                    { name: "Front Man", url: "https://drive.google.com/file/d/1e6e2IeFwnj9SV69oc36Z7vfqDJ44cRMP/preview", desc: "The mysterious Front Man is revealed to have a personal connection." },
+                    { name: "One Lucky Day", url: "https://drive.google.com/file/d/12cWTU0zidBpi7LU2hxdQ3LMa8SoFHe5V/preview", desc: "The final game leaves only a few participants for the ultimate prize." }
+                ]
+            },
+            {
+                label: "Season 2",
+                episodes: [
+                    { name: "Welcome to the Game", url: "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz123456/preview", desc: "Gi-hun returns, determined to bring down the organisation behind the games." },
+                    { name: "Halloween Party", url: "https://drive.google.com/file/d/1BbCdEfGhIjKlMnOpQrStUvWxYz234567/preview", desc: "Players gather for another deadly round under a new set of rules." },
+                    { name: "Round and Round", url: "https://drive.google.com/file/d/1CcDeFgHiJkLmNoPqRsTuVwXyZ345678/preview", desc: "A carnival-themed game tests the players' wits and alliances." },
+                    { name: "Six Legs", url: "https://drive.google.com/file/d/1DdEfGhIjKlMnOpQrStUvWxYz456789a/preview", desc: "Teams of six must cooperate perfectly — or face elimination together." },
+                    { name: "One More Step", url: "https://drive.google.com/file/d/1EeFgHiJkLmNoPqRsTuVwXyZa567890b/preview", desc: "Gi-hun uncovers a mole within the player ranks." },
+                    { name: "Sin and Punishment", url: "https://drive.google.com/file/d/1FfGhIjKlMnOpQrStUvWxYzAb678901c/preview", desc: "A vote shakes up the game and exposes the real masterminds." },
+                    { name: "Friend or Foe", url: "https://drive.google.com/file/d/1GgHiJkLmNoPqRsTuVwXyZaBc789012d/preview", desc: "Alliances fracture as the penultimate challenge begins." }
+                ]
+            }
+        ];
+
+        // THE BOYS — Season 1 only (extend as needed)
+        const theBoysSeasons = [
+            {
+                label: "Season 1",
+                episodes: [
+                    { name: "The Name of the Game", url: "https://drive.google.com/file/d/1L6kkf82wzAgxtOs34Pvt-iL8_LfZdxhm/preview", desc: "The Boys are brought back together to take down corrupt superheroes." },
+                    { name: "Cherry", url: "https://drive.google.com/file/d/1Nu8K2JieShguMQY2THv1ZY4Zgy4z9ha4/preview", desc: "Hughie grapples with the traumatic loss of his girlfriend." },
+                    { name: "Get Some", url: "https://drive.google.com/file/d/12pg3xxH7wnxT83RfPoIIHjA6kV3auxjF/preview", desc: "The Boys target The Deep." },
+                    { name: "The Female", url: "https://drive.google.com/file/d/11yNhNYSN4shlgJ-f5p0tzqftBdJ1hrfz/preview", desc: "The Boys encounter Kimiko, a mysterious super-powered individual." },
+                    { name: "Good for the Soul", url: "https://drive.google.com/file/d/1DEzpdyNsPqOY-dIcYDcJuMAke1yk4CiG/preview", desc: "Hughie and Starlight are forced to work together on a PR stunt." },
+                    { name: "The Innocents", url: "https://drive.google.com/file/d/1iIi5Rsdz6-ORqf8u2Z59cv9KsWku_WOA/preview", desc: "The Boys delve into the history of Vought International." },
+                    { name: "The Self-Preservation Society", url: "https://drive.google.com/file/d/1zPMLK925VJX5lOWoHnSDpmx0EHSloI50/preview", desc: "The Boys find themselves in increasingly dangerous situations." },
+                    { name: "You Found Me", url: "https://drive.google.com/file/d/1V5T42SX6dh7GmhkEzPxHvQ1xmdtKOerd/preview", desc: "A shocking confrontation between Billy Butcher and Homelander." }
+                ]
+            }
+        ];
+
+        // FAMILY GUY — Season 1
+        const familyGuySeasons = [
+            {
+                label: "Season 1",
+                episodes: [
+                    { name: "Death Has a Shadow", url: "https://drive.google.com/file/d/1MlW9gQUj2awccOkyN5hWsAyHQotqtprs/preview", desc: "Peter accidentally claims welfare money." },
+                    { name: "I Never Met the Dead Man", url: "https://drive.google.com/file/d/1rbEEaViuyaHurRqVTKl6Fi44zWpRCdD2/preview", desc: "Peter loses his driver's license." },
+                    { name: "Chitty Chitty Death Bang", url: "https://drive.google.com/file/d/1kxQK0K3Vxfs3YET3RQL5CB2IML_5R2FP/preview", desc: "Peter tries to make his own amusement park." },
+                    { name: "Mind Over Murder", url: "https://drive.google.com/file/d/17NCz9nawhjEzZZWQy1BPUAT6oGH-9HbQ/preview", desc: "Lois encourages Peter to start a neighborhood pub." },
+                    { name: "A Hero Sits Next Door", url: "https://drive.google.com/file/d/1nwkGqoPh7xIkegq6l2g7CtWbFN-dzlmt/preview", desc: "A new neighbor moves in and becomes Peter's obsession." },
+                    { name: "The Son Also Draws", url: "https://drive.google.com/file/d/13yOXNF6vgYigu0ota8lUQWx9B7KhW27L/preview", desc: "The family takes a road trip to the Grand Canyon." },
+                    { name: "Brian: Portrait of a Dog", url: "https://drive.google.com/file/d/1ugonO8JfU5g5riLKS6LniLQ7z9XKmow_/preview", desc: "Brian is unfairly punished and runs away." }
+                ]
+            }
+        ];
+
+        // SPY X FAMILY
+        const spyFamilySeasons = [
+            {
+                label: "Season 1",
+                episodes: [
+                    { name: "Operation Strix", url: "https://drive.google.com/file/d/1fKoBJycU0rihdlwfUsOHMQa9tYov-cyE/preview", desc: "Master spy Twilight takes on his most challenging mission." },
+                    { name: "Secure a Wife", url: "https://drive.google.com/file/d/15q5D_pK1kMbx_-fDg-NB9kuXWnaKNk_J/preview", desc: "Loid encounters Yor Briar, a seemingly ordinary woman." },
+                    { name: "Prepare for the Interview", url: "https://drive.google.com/file/d/1WrP4lWYmNveeSUDzxkPi9_5c6B1nYcTm/preview", desc: "The newly formed Forger family embarks on rigorous training." },
+                    { name: "The Prestigious School's Interview", url: "https://drive.google.com/file/d/1D9BO47NDJI4c2Sh4z8hZjQaHV-A2lpIt/preview", desc: "The Forgers face the intense interview process at Eden Academy." },
+                    { name: "Will They Pass or Fail", url: "https://drive.google.com/file/d/1WSc_ox6tZuKw6T6zbsCBQoRb6Ibs7ytK/preview", desc: "The Forgers anxiously await the results of the entrance exam." },
+                    { name: "The Friendship Scheme", url: "https://drive.google.com/file/d/14kN32Ox9W8K4P1XNafxZo9zTx5MJHolP/preview", desc: "Anya struggles to befriend Damian Desmond." },
+                    { name: "The Target's Second Son", url: "https://drive.google.com/file/d/1Fr3KS31mOJpA4FxmVOde3F2DkU5c5jbT/preview", desc: "Anya attempts various strategies to get closer to Damian." },
+                    { name: "The Counter-Secret Police Cover Operation", url: "https://drive.google.com/file/d/1vW3OlJKl_G922I3e0OeXHyisMPQZV0fH/preview", desc: "Yor's younger brother visits the Forger household." }
+                ]
+            }
+        ];
+
+        // DEMON SLAYER
+        const demonSlayerSeasons = [
+            {
+                label: "Season 1",
+                episodes: [
+                    { name: "Cruelty", url: "https://drive.google.com/file/d/1TrABeWtrbgkHjxSafZ89LW2TN5W-4bYC/preview", desc: "Tanjiro returns home to find his family massacred." },
+                    { name: "Trainer Sakonji Urokodaki", url: "https://drive.google.com/file/d/103tUxwBxZjzHo2vH2dIqgoCglgXhVOzx/preview", desc: "Tanjiro begins his training with Sakonji Urokodaki." },
+                    { name: "Sabito and Makomo", url: "https://drive.google.com/file/d/1oLr45hNRF1-wqMu1yssgSOrohyUlCBeR/preview", desc: "Tanjiro faces the Final Selection to become a Demon Slayer." },
+                    { name: "Final Selection", url: "https://drive.google.com/file/d/1xLsVvTZkUIth7Q34_TRbSOJZ_V8ARVwT/preview", desc: "Tanjiro confronts the Hand Demon during Final Selection." },
+                    { name: "My Own Steel", url: "https://drive.google.com/file/d/1K0mOwY1TDouScbDB_BtCMYAA1aYd-QyT/preview", desc: "Tanjiro receives his Nichirin Sword and uniform." },
+                    { name: "Swordsman Accompanying a Demon", url: "https://drive.google.com/file/d/1uGRdol3P_nom-39qPeOgmhIhrQ0CnGwh/preview", desc: "Tanjiro's first mission takes him to a village." },
+                    { name: "Demon of the Swamp", url: "https://drive.google.com/file/d/1iEulTg7Y-zq0eEd5iwi9yig_UCujALo-/preview", desc: "Tanjiro faces two demons in a swamp." },
+                    { name: "The Smell of Enchanting Blood", url: "https://drive.google.com/file/d/1TWlU2BBjp2qmUyQjYArj3KwuYR6Bq1SE/preview", desc: "Tanjiro encounters the Temari Demon and Arrow Demon." }
+                ]
+            }
+        ];
+
+        // JUJUTSU KAISEN
+        const jujutsuSeasons = [
+            {
+                label: "Season 1",
+                episodes: [
+                    { name: "Ryomen Sukuna", url: "https://drive.google.com/file/d/1ouFiPb_r9qtwz3OWgTT_Ko9iEtpkmaHn/preview", desc: "Yuji Itadori swallows a cursed object to save a friend." },
+                    { name: "For Myself", url: "https://drive.google.com/file/d/1a0K_zblfuVDPHdgUt5FQpeDBjhtibX35/preview", desc: "Satoru Gojo brings Yuji to Tokyo Jujutsu High School." },
+                    { name: "Girl of Steel", url: "https://drive.google.com/file/d/1XS3zb6a2aW5ubJwB105RQYbaObpHLKqh/preview", desc: "The third first-year student, Nobara Kugisaki, arrives." },
+                    { name: "Curse Womb Must Die", url: "https://drive.google.com/file/d/1F-5EBOKtIzoQe0nPMEqtfUvwXpeD39nQ/preview", desc: "The first-years are sent to rescue inmates at a detention center." },
+                    { name: "Curse Womb Must Die -II-", url: "https://drive.google.com/file/d/1gIfqomnV_OaKGTah_kYdPWhe9YeazpRv/preview", desc: "Yuji allows Sukuna to take over to fight the curse." },
+                    { name: "After Rain", url: "https://drive.google.com/file/d/1XJ1nYWtTXE7iK3W6gQMTzCPVK4KNudOt/preview", desc: "Megumi and Nobara reflect on their mission's failure." },
+                    { name: "Assault", url: "https://drive.google.com/file/d/12-F1_Zk2MyFq0hNsqrdh8ztyB2yw2Ykh/preview", desc: "Gojo is ambushed by Jogo, a special grade curse." },
+                    { name: "Boredom", url: "https://drive.google.com/file/d/1D3UX5iHbjkZLDzGz4Gn-msPxKyfVRBlB/preview", desc: "Second-year students from Kyoto Jujutsu High arrive." }
+                ]
+            }
+        ];
+
+        // ONE-PUNCH MAN
+        const onePunchSeasons = [
+            {
+                label: "Season 1",
+                episodes: [
+                    { name: "The Strongest Man", url: "https://drive.google.com/file/d/14SRzKmZoK6rFvAymYp77-xnP2xKNnu02/preview", desc: "Saitama, a hero who can defeat any foe with a single punch." },
+                    { name: "The Lone Cyborg", url: "https://drive.google.com/file/d/1VmTBKPoOsarN5DG6w9LmM2MU23yEWc55/preview", desc: "Saitama encounters Genos, a powerful cyborg." },
+                    { name: "The Obsessive Scientist", url: "https://drive.google.com/file/d/1mpxR6GsgC1gHcB_fLGGgV-yINZKpOvaC/preview", desc: "Saitama and Genos investigate the House of Evolution." },
+                    { name: "The Modern Ninja", url: "https://drive.google.com/file/d/1XexHMLTXOoxOyPiUYXB4QYcEIY6Lqke5/preview", desc: "Speed-o'-Sound Sonic clashes with Saitama." },
+                    { name: "The Ultimate Master", url: "https://drive.google.com/file/d/1NJyYog45TAMlpLFLX7iIvRsiw3lGazvR/preview", desc: "Saitama and Genos seek out the martial arts master Bang." },
+                    { name: "The Terrifying City", url: "https://drive.google.com/file/d/1yiZuJgLaeiT16nEWaTSUGH0U5E-stcRM/preview", desc: "City Z is declared a ghost town as monsters appear." },
+                    { name: "The Ultimate Disciple", url: "https://drive.google.com/file/d/10A3723m3sdtPebsNpiw-PIrZCKuK-d8i/preview", desc: "Genos faces a powerful monster while protecting civilians." },
+                    { name: "The Deep Sea King", url: "https://drive.google.com/file/d/1ONi4w_88OGXI5YlKB4kiByEHmpDj7SiL/preview", desc: "A powerful monster emerges from the ocean." }
+                ]
+            }
+        ];
+
+        // SOLO LEVELING
+        const soloLevelingSeasons = [
+            {
+                label: "Season 1",
+                episodes: [
+                    { name: "I'm Used to It", url: "https://drive.google.com/file/d/1Pced2D_GcBWGiO1FYPqJmP2_SdtDGonq/preview", desc: "Sung Jinwoo joins a raid party for a D-Gate." },
+                    { name: "If I Had One More Chance", url: "https://drive.google.com/file/d/1AowuU1eRGad_NrGWcrGQ1Q1bZeTioULz/preview", desc: "Betrayed and left for dead, Jinwoo accepts a mysterious offer." },
+                    { name: "It's Like a Game", url: "https://drive.google.com/file/d/13bq6xo7ywzs0lE-P4hReomH_N4ULcXSA/preview", desc: "Jinwoo begins to understand his new reality." },
+                    { name: "I've Gotta Get Stronger", url: "https://drive.google.com/file/d/14VxKOLYVyXzvEuRjI3t17YT86svNzetC/preview", desc: "Jinwoo enters his first solo instance dungeon." },
+                    { name: "A Pretty Good Deal", url: "https://drive.google.com/file/d/1y9avrwaqKKlbFjrbvJ5HbywyK64XQMQ_/preview", desc: "Jinwoo joins a C-rank raid led by Hwang Dongsuk." },
+                    { name: "The Real Hunt Begins", url: "https://drive.google.com/file/d/1A9apI3Zp6ibmE3ZphF_PLHp3J97WRiJp/preview", desc: "Trapped with a giant spider boss." },
+                    { name: "Let's See How Far I Can Go", url: "https://drive.google.com/file/d/1HlSsYeTdIBu3EcYjmNFrGTql3t8kBczV/preview", desc: "Jinwoo teams up with Yoo Jinho." },
+                    { name: "This is Frustrating", url: "https://drive.google.com/file/d/1RLIZuxUBkeZMJWQR_s3wuQrcKLait7km/preview", desc: "Agents become suspicious of Jinwoo's growth." }
+                ]
+            }
+        ];
+
+        // ─── STATE ───────────────────────────────────────────────────────────────
+        let currentSeasons = [];
+        let currentSeasonIndex = 0;
+        let currentEpisodeIndex = 0;
+
+        // ─── FUNCTIONS ───────────────────────────────────────────────────────────
+
+        function openMovie(title, url, type) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('videoFrame').src = url;
+            document.getElementById('seasonTabs').style.display = 'none';
+            document.getElementById('episodeSelector').style.display = 'none';
+            document.getElementById('videoModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openSeriesWithSeasons(title, seasons) {
+            currentSeasons = seasons;
+            currentSeasonIndex = 0;
+            currentEpisodeIndex = 0;
+
+            document.getElementById('modalTitle').textContent = title;
+
+            // Build season tabs
+            const tabsContainer = document.getElementById('seasonTabs');
+            if (seasons.length > 1) {
+                tabsContainer.style.display = 'flex';
+                tabsContainer.innerHTML = '';
+                seasons.forEach((season, idx) => {
+                    const tab = document.createElement('button');
+                    tab.className = 'season-tab' + (idx === 0 ? ' active' : '');
+                    tab.textContent = season.label;
+                    tab.onclick = () => selectSeason(idx);
+                    tabsContainer.appendChild(tab);
+                });
+            } else {
+                tabsContainer.style.display = 'none';
+            }
+
+            // Load first season's episodes
+            loadEpisodes(0, 0);
+
+            document.getElementById('episodeSelector').style.display = 'block';
+            document.getElementById('videoModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function selectSeason(seasonIdx) {
+            currentSeasonIndex = seasonIdx;
+            currentEpisodeIndex = 0;
+
+            // Update tab active state
+            document.querySelectorAll('.season-tab').forEach((tab, i) => {
+                tab.classList.toggle('active', i === seasonIdx);
+            });
+
+            loadEpisodes(seasonIdx, 0);
+        }
+
+        function loadEpisodes(seasonIdx, startEpIdx) {
+            const episodes = currentSeasons[seasonIdx].episodes;
+            document.getElementById('videoFrame').src = episodes[startEpIdx].url;
+
+            const list = document.getElementById('episodeList');
+            list.innerHTML = '';
+            episodes.forEach((ep, idx) => {
+                const item = document.createElement('div');
+                item.className = 'episode-item' + (idx === startEpIdx ? ' active' : '');
+                item.innerHTML = `
+                    <div class="episode-number">${idx + 1}</div>
+                    <div class="episode-info">
+                        <div class="episode-name">${ep.name}</div>
+                        <div class="episode-desc">${ep.desc}</div>
+                    </div>
+                `;
+                item.onclick = () => selectEpisode(idx);
+                list.appendChild(item);
+            });
+        }
+
+        function selectEpisode(idx) {
+            currentEpisodeIndex = idx;
+            const ep = currentSeasons[currentSeasonIndex].episodes[idx];
+            document.getElementById('videoFrame').src = ep.url;
+
+            document.querySelectorAll('.episode-item').forEach((item, i) => {
+                item.classList.toggle('active', i === idx);
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('videoModal').classList.remove('active');
+            document.getElementById('videoFrame').src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('videoModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
