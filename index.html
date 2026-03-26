@@ -25,6 +25,7 @@
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
+      perspective: 1000px;
     }
 
     body::before {
@@ -240,7 +241,6 @@
     .cloak-btn:hover {
       background: rgba(255, 255, 255, 0.1);
       border-color: rgba(255, 255, 255, 0.3);
-      transform: translateX(5px);
     }
 
     .cloak-btn.active {
@@ -371,6 +371,7 @@
       width: 100%;
       max-width: 1000px;
       margin-bottom: 3rem;
+      transform-style: preserve-3d;
     }
 
     .card {
@@ -381,7 +382,7 @@
       text-align: center;
       position: relative;
       overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.1s;
       backdrop-filter: blur(10px);
       text-decoration: none;
       color: inherit;
@@ -389,10 +390,11 @@
       flex-direction: column;
       align-items: center;
       gap: 1rem;
+      transform-style: preserve-3d;
+      transform: translateZ(0);
     }
 
     .card:hover {
-      transform: translateY(-10px);
       background: rgba(255, 255, 255, 0.15);
       border-color: rgba(255, 255, 255, 0.4);
       box-shadow: 
@@ -412,12 +414,14 @@
       transition: all 0.3s;
       overflow: hidden;
       font-size: 2.5rem;
+      transform: translateZ(10px);
     }
 
     .card:hover .card-icon-wrapper {
       background: rgba(0, 0, 0, 0.5);
       border-color: rgba(255, 255, 255, 0.5);
       box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      transform: translateZ(30px);
     }
 
     .card-icon-wrapper img {
@@ -435,19 +439,20 @@
       text-transform: uppercase;
       letter-spacing: 2px;
       margin: 0;
+      transform: translateZ(15px);
     }
 
     .card p {
       font-size: 0.9rem;
       color: rgba(255, 255, 255, 0.7);
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(10px) translateZ(5px);
       transition: all 0.3s;
     }
 
     .card:hover p {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) translateZ(20px);
     }
 
     .card-games:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 0, 85, 0.3); }
@@ -466,6 +471,7 @@
       #clock { font-size: 2rem; }
     }
   </style>
+<base target="_blank">
 </head>
 <body>
   <div class="cursor"></div>
@@ -536,7 +542,7 @@
     </div>
 
     <div class="cards-grid">
-      <a href="games.html" class="card card-games">
+      <a href="games.html" class="card card-games tilt-3d" data-tilt>
         <div class="card-icon-wrapper">
           <i class="fas fa-gamepad" style="color: #fff; filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));"></i>
         </div>
@@ -544,7 +550,7 @@
         <p>Play Now</p>
       </a>
 
-      <a href="tv.html" class="card card-tv">
+      <a href="tv.html" class="card card-tv tilt-3d" data-tilt>
         <div class="card-icon-wrapper">
           <i class="fas fa-tv" style="color: #fff; filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));"></i>
         </div>
@@ -552,7 +558,7 @@
         <p>Watch Now</p>
       </a>
 
-      <a href="music.html" class="card card-music">
+      <a href="music.html" class="card card-music tilt-3d" data-tilt>
         <div class="card-icon-wrapper">
           <i class="fas fa-music" style="color: #fff; filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));"></i>
         </div>
@@ -560,7 +566,7 @@
         <p>Listen Now</p>
       </a>
 
-      <a href="proxy.html" class="card card-proxy">
+      <a href="proxy.html" class="card card-proxy tilt-3d" data-tilt>
         <div class="card-icon-wrapper">
           <span style="font-size: 2.5rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));">🌐</span>
         </div>
@@ -585,6 +591,8 @@
         createMarkerParticle(e.clientX, e.clientY);
         lastParticle = now;
       }
+      
+      handle3DTilt(e);
     });
 
     function createMarkerParticle(x, y) {
@@ -613,8 +621,35 @@
     const interactiveElements = document.querySelectorAll('a, .card, .widget-container, button, .cloak-btn');
     interactiveElements.forEach(el => {
       el.addEventListener('mouseenter', () => cursor.classList.add('active'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('active'));
+      el.addEventListener('mouseleave', () => {
+        cursor.classList.remove('active');
+        reset3DTilt(el);
+      });
     });
+
+    function handle3DTilt(e) {
+      const tiltElements = document.querySelectorAll('.tilt-3d');
+      
+      tiltElements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 10;
+        const rotateY = (centerX - x) / 10;
+        
+        if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+          el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+        }
+      });
+    }
+
+    function reset3DTilt(el) {
+      el.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+    }
 
     function createRain() {
       const container = document.getElementById('rainContainer');
